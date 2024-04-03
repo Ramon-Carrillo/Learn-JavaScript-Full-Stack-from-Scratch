@@ -1,8 +1,28 @@
+const usersCollection = require("../db").collection("users");
 const validator = require("validator");
 
 let User = function (data) {
   this.data = data;
   this.errors = [];
+};
+
+User.prototype.cleanUp = function () {
+  if (typeof this.data.username !== "string") {
+    this.data.username = "";
+  }
+  if (typeof this.data.email !== "string") {
+    this.data.email = "";
+  }
+  if (typeof this.data.password !== "string") {
+    this.data.password = "";
+  }
+
+  // Get rid of any bogus properties
+  this.data = {
+    username: this.data.username.trim().toLowerCase(),
+    email: this.data.email.trim().toLowerCase(),
+    password: this.data.password,
+  };
 };
 
 User.prototype.validate = function () {
@@ -42,10 +62,31 @@ User.prototype.validate = function () {
   }
 };
 
+/* User login */
+User.prototype.login = function () {
+  return new Promise(async (resolve, reject) => {
+    this.cleanUp();
+    const attemptedUser = await usersCollection.findOne({
+      username: this.data.username,
+    });
+    if (attemptedUser && attemptedUser.password === this.data.password) {
+      resolve("You are logged in");
+    } else {
+      reject("Invalid username / password");
+    }
+  });
+};
+
 User.prototype.register = function () {
   // Step #1: Validate user data
+  this.cleanUp();
   this.validate();
-  // Step #2: Save data to database
+
+  // Step #2: Save data to database only if there are no validation errors
+  if (!this.errors.length) {
+    // Save user data to database
+    usersCollection.insertOne(this.data);
+  }
 };
 
 module.exports = User;
