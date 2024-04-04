@@ -5,22 +5,30 @@ const login = function (req, res) {
   const userLogin = async () => {
     try {
       await user.login();
-      res.send("You are now logged in");
+      req.session.user = { username: user.data.username };
+      req.session.save(() => res.redirect("/"));
     } catch (e) {
-      res.send(e);
+      req.flash("errors", e);
+      req.session.save(() => res.redirect("/"));
     }
   };
   userLogin();
 };
-const logout = function () {};
+const logout = function (req, res) {
+  req.session.destroy(() => {
+    res.redirect("/");
+  });
+};
 
 const register = function (req, res) {
   let user = new User(req.body);
   user.register();
-  res.send("Thanks for trying to register");
+  res.send("Thanks for register");
 };
 const home = function (req, res) {
-  res.render("home-guest");
+  req.session.user
+    ? res.render("home-dashboard", { username: req.session.user.username })
+    : res.render("home-guest", { errors: req.flash("errors") });
 };
 
 module.exports = {
