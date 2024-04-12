@@ -14,7 +14,11 @@ const login = function (req, res) {
   const userLogin = async () => {
     try {
       await user.login();
-      req.session.user = { avatar: user.avatar, username: user.data.username };
+      req.session.user = {
+        avatar: user.avatar,
+        username: user.data.username,
+        _id: user.data._id,
+      };
       req.session.save(() => res.redirect("/"));
     } catch (e) {
       req.flash("errors", e);
@@ -34,7 +38,11 @@ const register = async function (req, res) {
   const userRegister = async () => {
     try {
       await user.register();
-      req.session.user = { username: user.data.username, avatar: user.avatar };
+      req.session.user = {
+        username: user.data.username,
+        avatar: user.avatar,
+        _id: user.data._id,
+      };
       req.session.save(() => res.redirect("/"));
     } catch (e) {
       req.flash("regErrors", e);
@@ -45,10 +53,7 @@ const register = async function (req, res) {
 };
 const home = function (req, res) {
   req.session.user
-    ? res.render("home-dashboard", {
-        username: req.session.user.username,
-        avatar: req.session.user.avatar,
-      })
+    ? res.render("home-dashboard")
     : res.render("home-guest", {
         errors: req.flash("errors"),
         regErrors: req.flash("regErrors"),
