@@ -37,6 +37,8 @@ router.post(
   postController.deletePost
 );
 
+router.post("/search", postController.search);
+
 // Profile related routes
 router.get(
   "/profile/:username",

@@ -85,6 +85,16 @@ const deletePost = function (req, res) {
     });
 };
 
+const search = function (req, res) {
+  Post.search(req.body.searchTerm)
+    .then((posts) => {
+      res.json(posts);
+    })
+    .catch(() => {
+      res.json([]);
+    });
+};
+
 module.exports = {
   viewCreateScreen,
   create,
@@ -92,4 +102,5 @@ module.exports = {
   viewEditScreen,
   edit,
   deletePost,
+  search,
 };
