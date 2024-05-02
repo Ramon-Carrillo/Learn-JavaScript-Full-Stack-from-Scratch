@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userController = require("./controllers/userController");
 const postController = require("./controllers/postController");
+const followController = require("./controllers/followController");
 
 // User related routes
 router.get("/", userController.home);
@@ -43,7 +44,35 @@ router.post("/search", postController.search);
 router.get(
   "/profile/:username",
   userController.ifUserExists,
+  userController.sharedProfileData,
   userController.profilePostsScreen
+);
+
+router.get(
+  "/profile/:username/followers",
+  userController.ifUserExists,
+  userController.sharedProfileData,
+  userController.profileFollowersScreen
+);
+
+router.get(
+  "/profile/:username/following",
+  userController.ifUserExists,
+  userController.sharedProfileData,
+  userController.profileFollowingScreen
+);
+
+// Follow related routes
+router.post(
+  "/addFollow/:username",
+  followController.addFollow,
+  userController.mustBeLoggedIn
+);
+
+router.post(
+  "/removeFollow/:username",
+  followController.removeFollow,
+  userController.mustBeLoggedIn
 );
 
 module.exports = router;
