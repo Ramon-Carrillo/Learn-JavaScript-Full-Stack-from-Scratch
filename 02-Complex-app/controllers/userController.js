@@ -168,6 +168,21 @@ const profileFollowingScreen = async function (req, res) {
   }
 };
 
+const doesUsernameExist = function (req, res) {
+  User.findByUsername(req.body.username)
+    .then(function () {
+      res.json(true);
+    })
+    .catch(function () {
+      res.json(false);
+    });
+};
+
+const doesEmailExist = async function (req, res) {
+  let emailBool = await User.doesEmailExist(req.body.email);
+  res.json(emailBool);
+};
+
 module.exports = {
   mustBeLoggedIn,
   login,
@@ -179,4 +194,6 @@ module.exports = {
   sharedProfileData,
   profileFollowersScreen,
   profileFollowingScreen,
+  doesUsernameExist,
+  doesEmailExist,
 };
